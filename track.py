@@ -16,7 +16,7 @@ import torch.backends.cudnn as cudnn
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # yolov5 strongsort root directory
-WEIGHTS = ROOT / 'yolov5/weights'
+WEIGHTS = ROOT / 'weights'
 
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
@@ -119,7 +119,6 @@ def run(
             StrongSORT(
                 strong_sort_weights,
                 device,
-                half,
                 max_dist=cfg.STRONGSORT.MAX_DIST,
                 max_iou_distance=cfg.STRONGSORT.MAX_IOU_DISTANCE,
                 max_age=cfg.STRONGSORT.MAX_AGE,
@@ -130,7 +129,6 @@ def run(
 
             )
         )
-        strongsort_list[i].model.warmup()
     outputs = [None] * nr_sources
 
     # Run tracking
@@ -222,8 +220,8 @@ def run(
                             bbox_h = output[3] - output[1]
                             # Write MOT compliant results to file
                             with open(txt_path + '.txt', 'a') as f:
-                                f.write(('%g ' * 7 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
-                                                               bbox_top, bbox_w, bbox_h, conf))
+                                f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
+                                                               bbox_top, bbox_w, bbox_h, -1, -1, -1, i))
 
                         if save_vid or save_crop or show_vid:  # Add bbox to image
                             c = int(cls)  # integer class
